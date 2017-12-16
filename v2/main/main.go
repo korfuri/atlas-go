@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/hashicorp/atlas-go/v2"
 )
@@ -14,7 +13,7 @@ func checkErr(err error) {
 }
 
 func main() {
-	c, err := terraformenterprise.NewClient(os.Getenv("ATLAS_TOKEN"))
+	c, err := terraformenterprise.NewClient(terraformenterprise.DefaultClientOptions())
 	checkErr(err)
 
 	ws, err := c.ListWorkspaces("Grab-TestAPI")

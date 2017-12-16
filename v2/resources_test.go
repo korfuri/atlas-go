@@ -11,7 +11,7 @@ import (
 )
 
 func TestUnserializeWorkspacesList(t *testing.T) {
-	r, err := os.Open("./examples/api__v2__organizaations__GrabTerraform__workspaces")
+	r, err := os.Open("./examples/api__v2__organizations__GrabTerraform__workspaces")
 	if err != nil {
 		t.Fatal(err)
 	}

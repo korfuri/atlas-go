@@ -24,7 +24,7 @@ type RequestOptions struct {
 }
 
 // Request creates a new HTTP request using the given verb and sub path.
-func (c *Client) Request(verb, spath string, ro *RequestOptions) (*http.Request, error) {
+func (c *Client) NewRequest(verb, spath string, ro *RequestOptions) (*http.Request, error) {
 	// Ensure we have a RequestOptions struct (passing nil is an acceptable)
 	if ro == nil {
 		ro = new(RequestOptions)
@@ -35,15 +35,6 @@ func (c *Client) Request(verb, spath string, ro *RequestOptions) (*http.Request,
 	u.Path = path.Join(c.URL.Path, spath)
 
 	log.Printf("[INFO] request: %s %s", verb, u.Path)
-
-	// Add the token and other params
-	if c.token != "" {
-		if ro.Headers == nil {
-			ro.Headers = make(map[string]string)
-		}
-
-		ro.Headers[authorizationHeader] = fmt.Sprintf("Bearer %s", c.token)
-	}
 
 	return c.rawRequest(verb, &u, ro)
 }

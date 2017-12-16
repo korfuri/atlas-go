@@ -8,7 +8,7 @@ import (
 )
 
 func (c *Client) ListWorkspaces(organization string) ([]*Workspace, error) {
-	request, err := c.Request("GET", fmt.Sprintf("/organizations/%s/workspaces", organization), nil)
+	request, err := c.NewRequest("GET", fmt.Sprintf("/organizations/%s/workspaces", organization), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Wo
 	ro := &RequestOptions{
 		Body: buf,
 	}
-	request, err := c.Request("POST", fmt.Sprintf("/organizations/%s/workspaces", organization), ro)
+	request, err := c.NewRequest("POST", fmt.Sprintf("/organizations/%s/workspaces", organization), ro)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Wo
 }
 
 func (c *Client) DeleteWorkspace(organization string, workspaceName string) error {
-	request, err := c.Request("DELETE", fmt.Sprintf("/organizations/%s/workspaces/%s", organization, workspaceName), nil)
+	request, err := c.NewRequest("DELETE", fmt.Sprintf("/organizations/%s/workspaces/%s", organization, workspaceName), nil)
 	if err != nil {
 		return err
 	}

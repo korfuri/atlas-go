@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	// apiDefaultEndpoint is the default base URL for connecting
+	// defaultBaseURL is the default base URL for connecting
 	// to the Terraform Enterprise API
-	apiDefaultEndpoint = "https://atlas.hashicorp.com/api/v2"
+	defaultBaseURL = "https://atlas.hashicorp.com/api/v2"
 
 	// authorizationHeader is the name of the Authorization HTTP header
 	authorizationHeader = "Authorization"
@@ -36,14 +36,15 @@ const (
 	// This defaults to false (verify) and will change to true (skip
 	// verification) with any non-empty value
 	atlasTLSNoVerifyEnvVar = "ATLAS_TLS_NOVERIFY"
+
+	// atlasTokenEnvVar is the name of the env var that contains
+	// the user oauth token to talk to Terraform Enterprise
+	atlasTokenEnvVar = "ATLAS_TOKEN"
 )
 
 type Client struct {
 	// URL is the API endpoint
 	URL *url.URL
-
-	// token is the Authorization token
-	token string
 
 	// HTTPClient is the underlying http client with which to make requests.
 	HTTPClient *http.Client
@@ -53,37 +54,51 @@ type Client struct {
 	DefaultHeader http.Header
 }
 
-func NewClient(token string) (*Client, error) {
-	u, err := url.Parse(apiDefaultEndpoint)
+type ClientOptions struct {
+	BaseUrl string
+	DefaultHeader http.Header
+	NoVerifyTLS bool
+	CAPath string
+	CAFile string
+}
+
+func DefaultClientOptions() *ClientOptions {
+	header := make(http.Header)
+	header.Set(contentTypeHeader, defaultContentType)
+	header.Set(authorizationHeader, os.Getenv(atlasTokenEnvVar))
+	return &ClientOptions{
+		BaseUrl: defaultBaseURL,
+		DefaultHeader: header,
+		NoVerifyTLS: os.Getenv(atlasTLSNoVerifyEnvVar) != "",
+		CAPath: os.Getenv(atlasCAPathEnvVar),
+		CAFile: os.Getenv(atlasCAFileEnvVar),
+	}
+}
+
+func NewClient(opts *ClientOptions) (*Client, error) {
+	u, err := url.Parse(opts.BaseUrl)
 	if err != nil {
 		return nil, err
 	}
-	c := &Client{
+	client := &Client{
 		URL:   u,
-		token: token,
-		DefaultHeader: make(http.Header),
+		DefaultHeader: opts.DefaultHeader,
 	}
-	c.init()
-	c.DefaultHeader.Set(contentTypeHeader, defaultContentType)
-	return c, nil
-}
 
-// init() sets defaults on the client.
-func (c *Client) init() error {
-	c.HTTPClient = cleanhttp.DefaultClient()
+	client.HTTPClient = cleanhttp.DefaultClient()
 	tlsConfig := &tls.Config{}
-	if os.Getenv(atlasTLSNoVerifyEnvVar) != "" {
+	if opts.NoVerifyTLS {
 		tlsConfig.InsecureSkipVerify = true
 	}
-	err := rootcerts.ConfigureTLS(tlsConfig, &rootcerts.Config{
-		CAFile: os.Getenv(atlasCAFileEnvVar),
-		CAPath: os.Getenv(atlasCAPathEnvVar),
+	err = rootcerts.ConfigureTLS(tlsConfig, &rootcerts.Config{
+		CAFile: opts.CAFile,
+		CAPath: opts.CAPath,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	t := cleanhttp.DefaultTransport()
 	t.TLSClientConfig = tlsConfig
-	c.HTTPClient.Transport = t
-	return nil
+	client.HTTPClient.Transport = t
+	return client, nil
 }
