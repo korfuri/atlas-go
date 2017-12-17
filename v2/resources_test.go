@@ -1,4 +1,4 @@
-package terraformenterprise_test
+package tfe_test
 
 import (
 	"os"
@@ -15,12 +15,12 @@ func TestUnserializeWorkspacesList(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	workspaces, err := jsonapi.UnmarshalManyPayload(r, reflect.TypeOf(new(terraformenterprise.Workspace)))
+	workspaces, err := jsonapi.UnmarshalManyPayload(r, reflect.TypeOf(new(tfe.Workspace)))
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.Len(t, workspaces, 6)
 	t.Logf("Workspaces are: %v", workspaces)
-	assert.Equal(t, workspaces[0].(*terraformenterprise.Workspace).Name, "qa__base__network")
+	assert.Equal(t, workspaces[0].(*tfe.Workspace).Name, "qa__base__network")
 	t.Logf("Workspace[0] is: %v", workspaces[0])
 }

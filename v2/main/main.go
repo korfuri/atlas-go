@@ -13,14 +13,14 @@ func checkErr(err error) {
 }
 
 func main() {
-	c, err := terraformenterprise.NewClient(terraformenterprise.DefaultClientOptions())
+	c, err := tfe.NewClient(tfe.DefaultClientOptions())
 	checkErr(err)
 
 	ws, err := c.ListWorkspaces("Grab-TestAPI")
 	checkErr(err)
 	fmt.Print(ws)
 
-	w := &terraformenterprise.Workspace{}
+	w := &tfe.Workspace{}
 	w.Name = "test-uriel-destroy-me"
 	w2, err := c.CreateWorkspace("Grab-TestAPI", w)
 	checkErr(err)
@@ -35,7 +35,7 @@ func main() {
 	fmt.Println(vars)
 	//fmt.Println(vars[0])
 
-	v, err := c.CreateVariable("Grab-TestAPI", "test-uriel-destroy-me", &terraformenterprise.Variable{
+	v, err := c.CreateVariable("Grab-TestAPI", "test-uriel-destroy-me", &tfe.Variable{
 		Key:       "foo",
 		Value:     "bar",
 		Sensitive: false,
@@ -70,12 +70,12 @@ func main() {
 	fmt.Println(tokens)
 	fmt.Println(*tokens[0])
 
-	cw := &terraformenterprise.CompoundWorkspace{
+	cw := &tfe.CompoundWorkspace{
 		Name:             "test-compound-wspace",
 		WorkingDirectory: "/qa/base/network",
 		LinkableRepoID:   "Uriel-Test-Org/test-repo",
 		OAuthTokenID:     tokens[0].ID,
-		IngressTriggerAttributes: &terraformenterprise.IngressTriggerAttributesT{
+		IngressTriggerAttributes: &tfe.IngressTriggerAttributesT{
 			Branch:        "",
 			DefaultBranch: true,
 			VCSRootPath:   "",

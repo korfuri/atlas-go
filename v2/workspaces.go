@@ -1,4 +1,4 @@
-package terraformenterprise
+package tfe
 
 import (
 	"bytes"

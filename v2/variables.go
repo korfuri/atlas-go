@@ -1,4 +1,4 @@
-package terraformenterprise
+package tfe
 
 import (
 	"bytes"
@@ -74,7 +74,7 @@ func (c *Client) CreateVariable(organization string, workspace string, variable 
 	if err := jsonapi.UnmarshalPayload(response.Body, out_var); err != nil {
 		return nil, err
 	}
-	
+
 	return out_var, nil
 }
 
@@ -99,6 +99,6 @@ func (c *Client) UpdateVariable(variable *Variable) (*Variable, error) {
 	if err := jsonapi.UnmarshalPayload(response.Body, out_var); err != nil {
 		return nil, err
 	}
-	
-	return out_var, nil	
+
+	return out_var, nil
 }
