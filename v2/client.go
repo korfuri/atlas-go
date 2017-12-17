@@ -1,6 +1,7 @@
 package terraformenterprise
 
 import (
+	"fmt"
 	"net/url"
 	"net/http"
 	"os"
@@ -65,7 +66,7 @@ type ClientOptions struct {
 func DefaultClientOptions() *ClientOptions {
 	header := make(http.Header)
 	header.Set(contentTypeHeader, defaultContentType)
-	header.Set(authorizationHeader, os.Getenv(atlasTokenEnvVar))
+	header.Set(authorizationHeader, fmt.Sprintf("Bearer %s", os.Getenv(atlasTokenEnvVar)))
 	return &ClientOptions{
 		BaseUrl: defaultBaseURL,
 		DefaultHeader: header,
