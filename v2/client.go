@@ -22,8 +22,14 @@ const (
 	// contentTypeHeader is the name of the Content-Type HTTP header
 	contentTypeHeader = "Content-Type"
 
+	// userAgentHeader is the name of the User-Agent HTTP header
+	userAgentHeader = "User-Agent"
+
 	// defaultContentType is the content-type we should request from Terraform Enterprise
 	defaultContentType = "application/vnd.api+json"
+
+	// defaultUserAgent is the default User-Agent for HTTP requests
+	defaultUserAgent = "terraform-enterprise-go/0.1"
 
 	// atlasCAFileEnvVar is the environment variable that causes the client to
 	// load trusted certs from a file
@@ -67,6 +73,7 @@ func DefaultClientOptions() *ClientOptions {
 	header := make(http.Header)
 	header.Set(contentTypeHeader, defaultContentType)
 	header.Set(authorizationHeader, fmt.Sprintf("Bearer %s", os.Getenv(atlasTokenEnvVar)))
+	header.Set(userAgentHeader, defaultUserAgent)
 	return &ClientOptions{
 		BaseUrl:       defaultBaseURL,
 		DefaultHeader: header,

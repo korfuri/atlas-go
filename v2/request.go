@@ -81,9 +81,6 @@ func (c *Client) rawRequest(verb string, u *url.URL, ro *RequestOptions) (*http.
 	if ro.BodyLength > 0 {
 		request.ContentLength = ro.BodyLength
 	}
-
-	log.Printf("[DEBUG] raw request: %#v", request)
-
 	return request, nil
 }
 
