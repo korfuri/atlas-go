@@ -92,3 +92,13 @@ type OAuthToken struct {
 	HasSSHKey           bool         `jsonapi:"attr,has-ssh-key"`
 	OAuthClient         OAuthClientT `jsonapi:"relation,oauth-client`
 }
+
+type Variable struct {
+	ID        string     `jsonapi:"primary,vars"`
+	Key       string     `jsonapi:"attr,key"`
+	Value     string     `jsonapi:"attr,value"`
+	Sensitive bool       `jsonapi:"attr,sensitive"`
+	Category  string     `jsonapi:"attr,category"`
+	HCL       bool       `jsonapi:"attr,hcl"`
+	//Workspace *Workspace `jsonapi:"relation,configurable"`
+}
