@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"net/http"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -29,16 +28,24 @@ func makeWorkspaceHandler(t *testing.T, srv *testutils.Server) func(rw http.Resp
 			err := jsonapi.MarshalPayload(rw, workspaces)
 			assert.NoError(t, err)
 		case "POST":
-			ws, err := jsonapi.UnmarshalManyPayload(req.Body, reflect.TypeOf(new(Workspace)))
+			w := new(Workspace)
+			err := jsonapi.UnmarshalPayload(req.Body, w)
 			assert.NoError(t, err)
 			rw.WriteHeader(http.StatusOK)
-			ws[0].(*Workspace).ID = randomID()
-			workspaces = append(workspaces, ws[0].(*Workspace))
-			err = jsonapi.MarshalOnePayloadEmbedded(rw, ws[0].(*Workspace))
-			assert.NoError(t, err)
+			w.ID = randomID()
+			workspaces = append(workspaces, w)
+			err = jsonapi.MarshalOnePayloadEmbedded(rw, w)
 		case "DELETE":
-			wname := strings.Split(req.URL.Path, "/")[:]
-			t.Log(wname)
+			path := strings.Split(req.URL.Path, "/")
+			wname := path[len(path) - 1]
+			for i, w := range workspaces {
+				if w.Name == wname {
+					workspaces = workspaces[:i]
+					rw.WriteHeader(http.StatusOK)
+					return
+				}
+			}
+			rw.WriteHeader(http.StatusNotFound)
 		default:
 			t.Fail()
 		}
@@ -49,7 +56,9 @@ func TestLifecycle(t *testing.T) {
 	client, server := testingClientServer(t)
 	defer server.Stop()
 
-	server.Mux.HandleFunc("/organizations/TestOrg/workspaces/", makeWorkspaceHandler(t, server))
+	handler := makeWorkspaceHandler(t, server)
+	server.Mux.HandleFunc("/organizations/TestOrg/workspaces", handler)
+	server.Mux.HandleFunc("/organizations/TestOrg/workspaces/", handler)
 
 	workspaces, err := client.ListWorkspaces("TestOrg")
 	assert.NoError(t, err)
@@ -62,4 +71,12 @@ func TestLifecycle(t *testing.T) {
 	workspaces, err = client.ListWorkspaces("TestOrg")
 	assert.NoError(t, err)
 	assert.Len(t, workspaces, 1)
+	assert.Equal(t, "my-workspace", workspaces[0].Name)
+
+	err = client.DeleteWorkspace("TestOrg", "my-workspace")
+	assert.NoError(t, err)
+	
+	workspaces, err = client.ListWorkspaces("TestOrg")
+	assert.NoError(t, err)
+	assert.Len(t, workspaces, 0)
 }

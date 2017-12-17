@@ -104,7 +104,6 @@ func CheckResp(resp *http.Response, err error) (*http.Response, error) {
 	}
 
 	log.Printf("[INFO] response: %d (%s)", resp.StatusCode, resp.Status)
-	log.Printf("[DEBUG] response body: %s", resp.Body)
 	
 	switch resp.StatusCode {
 	case 200:
