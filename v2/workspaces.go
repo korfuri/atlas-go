@@ -3,8 +3,9 @@ package terraformenterprise
 import (
 	"bytes"
 	"fmt"
-	"github.com/google/jsonapi"
 	"reflect"
+
+	"github.com/google/jsonapi"
 )
 
 func (c *Client) ListWorkspaces(organization string) ([]*Workspace, error) {

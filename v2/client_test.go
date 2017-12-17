@@ -1,9 +1,10 @@
 package terraformenterprise
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
 	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRequest(t *testing.T) {
@@ -11,7 +12,7 @@ func TestRequest(t *testing.T) {
 	defer server.Stop()
 
 	server.Mux.HandleFunc("/somepath", func(rw http.ResponseWriter, r *http.Request) {})
-	
+
 	request, err := client.NewRequest("GET", "/somepath", nil)
 	assert.NoError(t, err)
 	response, err := client.HTTPClient.Do(request)

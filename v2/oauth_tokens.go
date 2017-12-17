@@ -2,8 +2,9 @@ package terraformenterprise
 
 import (
 	"fmt"
-	"github.com/google/jsonapi"
 	"reflect"
+
+	"github.com/google/jsonapi"
 )
 
 func (c *Client) ListOAuthTokens(organization string) ([]*OAuthToken, error) {

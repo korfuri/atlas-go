@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/google/jsonapi"
 	"github.com/hashicorp/atlas-go/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUnserializeWorkspacesList(t *testing.T) {

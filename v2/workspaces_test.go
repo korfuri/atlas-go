@@ -2,13 +2,14 @@ package terraformenterprise
 
 import (
 	"fmt"
-	"github.com/google/jsonapi"
-	"github.com/hashicorp/atlas-go/v2/testutils"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/google/jsonapi"
+	"github.com/hashicorp/atlas-go/v2/testutils"
+	"github.com/stretchr/testify/assert"
 )
 
 // randomID returns a random id for a new workspace
@@ -37,7 +38,7 @@ func makeWorkspaceHandler(t *testing.T, srv *testutils.Server) func(rw http.Resp
 			err = jsonapi.MarshalOnePayloadEmbedded(rw, w)
 		case "DELETE":
 			path := strings.Split(req.URL.Path, "/")
-			wname := path[len(path) - 1]
+			wname := path[len(path)-1]
 			for i, w := range workspaces {
 				if w.Name == wname {
 					workspaces = workspaces[:i]
@@ -75,7 +76,7 @@ func TestLifecycle(t *testing.T) {
 
 	err = client.DeleteWorkspace("TestOrg", "my-workspace")
 	assert.NoError(t, err)
-	
+
 	workspaces, err = client.ListWorkspaces("TestOrg")
 	assert.NoError(t, err)
 	assert.Len(t, workspaces, 0)

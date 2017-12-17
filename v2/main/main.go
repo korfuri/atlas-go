@@ -43,14 +43,14 @@ func main() {
 	fmt.Println(*tokens[0])
 
 	cw := &terraformenterprise.CompoundWorkspace{
-		Name: "test-compound-wspace",
+		Name:             "test-compound-wspace",
 		WorkingDirectory: "/qa/base/network",
-		LinkableRepoID: "Uriel-Test-Org/test-repo",
-		OAuthTokenID: tokens[0].ID,
+		LinkableRepoID:   "Uriel-Test-Org/test-repo",
+		OAuthTokenID:     tokens[0].ID,
 		IngressTriggerAttributes: &terraformenterprise.IngressTriggerAttributesT{
-			Branch: "",
+			Branch:        "",
 			DefaultBranch: true,
-			VCSRootPath: "",
+			VCSRootPath:   "",
 		},
 	}
 	fmt.Println(*cw)

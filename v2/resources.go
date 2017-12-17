@@ -9,10 +9,10 @@ type Organization struct {
 }
 
 type IngressTriggerAttributesT struct {
-	Branch string `jsonapi:"attr,branch"`
-	DefaultBranch bool `jsonapi:"attr,default-branch"`
-	VCSRootPath string `jsonapi:"attr,vcs-root-path"`
-	IngressSubmodules bool `jsonapi:"attr,ingress-submodules"`
+	Branch            string `jsonapi:"attr,branch"`
+	DefaultBranch     bool   `jsonapi:"attr,default-branch"`
+	VCSRootPath       string `jsonapi:"attr,vcs-root-path"`
+	IngressSubmodules bool   `jsonapi:"attr,ingress-submodules"`
 }
 
 // Workspace represents a workspace in Terraform Enterprise.  To
@@ -21,7 +21,7 @@ type IngressTriggerAttributesT struct {
 // https://www.terraform.io/docs/enterprise/api/workspaces.html
 type Workspace struct {
 	// ID is the ID of the workspace. Generated server-side.
-	ID   string `jsonapi:"primary,workspaces"`
+	ID string `jsonapi:"primary,workspaces"`
 
 	// Name is the human-friendly name of the workspace.
 	Name string `jsonapi:"attr,name"`
@@ -78,7 +78,7 @@ type CompoundWorkspace struct {
 
 	// IngressTriggerAttributes is the settings struct for VCS
 	// integration
-	IngressTriggerAttributes *IngressTriggerAttributesT `jsonapi:"attr,ingress-trigger-attributes"`	
+	IngressTriggerAttributes *IngressTriggerAttributesT `jsonapi:"attr,ingress-trigger-attributes"`
 }
 
 type OAuthClientT struct {
@@ -86,9 +86,9 @@ type OAuthClientT struct {
 }
 
 type OAuthToken struct {
-	ID string `jsonapi:"primary,oauth-tokens"`
-	CreatedAt time.Time `jsonapi:"attr,created-at,iso8601"`
-	ServiceProviderUser string `jsonapi:"attr,service-provider-user"`
-	HasSSHKey bool `jsonapi:"attr,has-ssh-key"`
-	OAuthClient OAuthClientT `jsonapi:"relation,oauth-client`
+	ID                  string       `jsonapi:"primary,oauth-tokens"`
+	CreatedAt           time.Time    `jsonapi:"attr,created-at,iso8601"`
+	ServiceProviderUser string       `jsonapi:"attr,service-provider-user"`
+	HasSSHKey           bool         `jsonapi:"attr,has-ssh-key"`
+	OAuthClient         OAuthClientT `jsonapi:"relation,oauth-client`
 }

@@ -2,9 +2,10 @@ package terraformenterprise
 
 import (
 	"net/http"
+	"testing"
+
 	"github.com/hashicorp/atlas-go/v2/testutils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func testingClientServer(t *testing.T) (*Client, *testutils.Server) {

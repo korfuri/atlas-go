@@ -1,12 +1,12 @@
 package terraformenterprise
 
 import (
-	"net/http"
-	"net/url"
 	"fmt"
 	"io"
-	"path"
 	"log"
+	"net/http"
+	"net/url"
+	"path"
 )
 
 // RequestOptions is the list of options to pass to the request.
@@ -104,7 +104,7 @@ func CheckResp(resp *http.Response, err error) (*http.Response, error) {
 	}
 
 	log.Printf("[INFO] response: %d (%s)", resp.StatusCode, resp.Status)
-	
+
 	switch resp.StatusCode {
 	case 200:
 		return resp, nil

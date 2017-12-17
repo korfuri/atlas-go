@@ -1,12 +1,12 @@
 package terraformenterprise
 
 import (
-	"fmt"
-	"net/url"
-	"net/http"
-	"os"
 	"crypto/tls"
-	
+	"fmt"
+	"net/http"
+	"net/url"
+	"os"
+
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/go-rootcerts"
 )
@@ -24,7 +24,7 @@ const (
 
 	// defaultContentType is the content-type we should request from Terraform Enterprise
 	defaultContentType = "application/vnd.api+json"
-	
+
 	// atlasCAFileEnvVar is the environment variable that causes the client to
 	// load trusted certs from a file
 	atlasCAFileEnvVar = "ATLAS_CAFILE"
@@ -56,11 +56,11 @@ type Client struct {
 }
 
 type ClientOptions struct {
-	BaseUrl string
+	BaseUrl       string
 	DefaultHeader http.Header
-	NoVerifyTLS bool
-	CAPath string
-	CAFile string
+	NoVerifyTLS   bool
+	CAPath        string
+	CAFile        string
 }
 
 func DefaultClientOptions() *ClientOptions {
@@ -68,11 +68,11 @@ func DefaultClientOptions() *ClientOptions {
 	header.Set(contentTypeHeader, defaultContentType)
 	header.Set(authorizationHeader, fmt.Sprintf("Bearer %s", os.Getenv(atlasTokenEnvVar)))
 	return &ClientOptions{
-		BaseUrl: defaultBaseURL,
+		BaseUrl:       defaultBaseURL,
 		DefaultHeader: header,
-		NoVerifyTLS: os.Getenv(atlasTLSNoVerifyEnvVar) != "",
-		CAPath: os.Getenv(atlasCAPathEnvVar),
-		CAFile: os.Getenv(atlasCAFileEnvVar),
+		NoVerifyTLS:   os.Getenv(atlasTLSNoVerifyEnvVar) != "",
+		CAPath:        os.Getenv(atlasCAPathEnvVar),
+		CAFile:        os.Getenv(atlasCAFileEnvVar),
 	}
 }
 
@@ -82,7 +82,7 @@ func NewClient(opts *ClientOptions) (*Client, error) {
 		return nil, err
 	}
 	client := &Client{
-		URL:   u,
+		URL:           u,
 		DefaultHeader: opts.DefaultHeader,
 	}
 
