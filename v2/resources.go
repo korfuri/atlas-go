@@ -100,5 +100,5 @@ type Variable struct {
 	Sensitive bool       `jsonapi:"attr,sensitive"`
 	Category  string     `jsonapi:"attr,category"`
 	HCL       bool       `jsonapi:"attr,hcl"`
-	//Workspace *Workspace `jsonapi:"relation,configurable"`
+	Workspace *Workspace `jsonapi:"relation,configurable"`
 }
