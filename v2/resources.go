@@ -4,37 +4,81 @@ import (
 	"time"
 )
 
-type IngressTriggerAttributesT struct {
-	Branch string `jsonapi:"attr,branch"`
-	//   "branch": "",
-	DefaultBranch string `jsonapi:"attr,default-branch"`
-	//   "default-branch": true,
-	VCSRootPath string `jsonapi:"attr,vcs-root-path"`
-	//   "vcs-root-path": "",
-	IngressSubmodules bool `jsonapi:"attr,ingress-submodules"`
-	//   "ingress-submodules": false
+type Organization struct {
+	ID string `jsonapi:"primary,organizations"`
 }
 
+type IngressTriggerAttributesT struct {
+	Branch string `jsonapi:"attr,branch"`
+	DefaultBranch bool `jsonapi:"attr,default-branch"`
+	VCSRootPath string `jsonapi:"attr,vcs-root-path"`
+	IngressSubmodules bool `jsonapi:"attr,ingress-submodules"`
+}
+
+// Workspace represents a workspace in Terraform Enterprise.  To
+// create a Workspace with a VCS connection, use CompoundWorkspace
+// instead.
+// https://www.terraform.io/docs/enterprise/api/workspaces.html
 type Workspace struct {
+	// ID is the ID of the workspace. Generated server-side.
 	ID   string `jsonapi:"primary,workspaces"`
+
+	// Name is the human-friendly name of the workspace.
 	Name string `jsonapi:"attr,name"`
-	// "name": "my-workspace-2",
+
+	// TODO what's that
 	Environment string `jsonapi:"attr,environment"`
-	// "environment": "default",
+
+	// AutoApply is whether changes get applied without human
+	// approval
 	AutoApply bool `jsonapi:"attr,auto-apply"`
-	// "auto-apply": false,
+
+	// TODO
 	Locked bool `jsonapi:"attr,locked"`
-	// "locked": false,
+
+	// CreatedAt is the timestamp of this workspace's creation
 	CreatedAt time.Time `jsonapi:"attr,created-at,iso8601"`
-	// "created-at": "2017-11-02T23:24:05.997Z",
+
+	// WorkingDirectory is the working directory within the VCS
+	// repository used to run Terraform for this workspace.
 	WorkingDirectory string `jsonapi:"attr,working-directory"`
-	// "working-directory": "",
+
+	// TerraformVersion is the version of Terraform in use in this
+	// workspace.
 	TerraformVersion string `jsonapi:"attr,terraform-version"`
-	// "terraform-version": "0.10.8",
+
+	// TODO what's that
 	CanQueueDestroyPlan bool `jsonapi:"attr,can-queue-destroy-plan"`
-	// "can-queue-destroy-plan": false,
+
+	// IngressTriggerAttributes is the settings struct for VCS
+	// integration
 	IngressTriggerAttributes *IngressTriggerAttributesT `jsonapi:"relation,ingress-trigger-attributes,omitempty"`
-	// "ingress-trigger-attributes": { ... }
+}
+
+// CompoundWorkspace is a special type of Workspace resource used only
+// when creating a VCS-integrated workspace.
+type CompoundWorkspace struct {
+	// Name is the name of the new workspace.
+	Name string `jsonapi:"attr,name"`
+
+	// LinkableRepiID is the name of the repository this workspace
+	// is linked to. If you're using Github or Bitbucket this is
+	// in the format "$user/$repo".
+	LinkableRepoID string `jsonapi:"attr,linkable-repo-id"`
+
+	// OAuthTokenID is the ID of a previously registered OAuth
+	// token for Terraform to connect to your VCS system (Github,
+	// Bitbucket, Gitlab...).
+	OAuthTokenID string `jsonapi:"attr,oauth-token-id"`
+
+	// WorkingDirectory is the path under the repo to which
+	// Terraform enterprise cd's before running
+	// Terraform. Optional.
+	WorkingDirectory string `jsonapi:"attr,working-directory,omitempty"`
+
+	// IngressTriggerAttributes is the settings struct for VCS
+	// integration
+	IngressTriggerAttributes *IngressTriggerAttributesT `jsonapi:"attr,ingress-trigger-attributes"`	
 }
 
 type OAuthClientT struct {

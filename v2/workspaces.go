@@ -48,7 +48,8 @@ func (c *Client) GetWorkspaceByID(organization string, workspaceId string) (*Wor
 	return nil, nil
 }
 
-// TODO: handle creating a workspace with VCS repo stuff
+// CreateWorkspace creates a workspace without VCS integration. For
+// VCS-integrated workspaces, see CreateCompoundWorkspace.
 func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Workspace, error) {
 	buf := new(bytes.Buffer)
 	if err := jsonapi.MarshalPayload(buf, workspace); err != nil {
@@ -58,6 +59,33 @@ func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Wo
 		Body: buf,
 	}
 	request, err := c.NewRequest("POST", fmt.Sprintf("/organizations/%s/workspaces", organization), ro)
+	if err != nil {
+		return nil, err
+	}
+	response, err := CheckResp(c.HTTPClient.Do(request))
+	if err != nil {
+		return nil, err
+	}
+
+	out_workspace := new(Workspace)
+	if err := jsonapi.UnmarshalPayload(response.Body, out_workspace); err != nil {
+		return nil, err
+	}
+
+	return out_workspace, nil
+}
+
+// CreateCompoundWorkspace creates a workspace with VCS integration.
+func (c *Client) CreateCompoundWorkspace(organization string, workspace *CompoundWorkspace) (*Workspace, error) {
+	buf := new(bytes.Buffer)
+	if err := jsonapi.MarshalPayload(buf, workspace); err != nil {
+		return nil, err
+	}
+	fmt.Println(buf)
+	ro := &RequestOptions{
+		Body: buf,
+	}
+	request, err := c.NewRequest("POST", "/compound-workspaces", ro)
 	if err != nil {
 		return nil, err
 	}
