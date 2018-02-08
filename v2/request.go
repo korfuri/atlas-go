@@ -34,7 +34,7 @@ func (c *Client) NewRequest(verb, spath string, ro *RequestOptions) (*http.Reque
 	u := *c.URL
 	u.Path = path.Join(c.URL.Path, spath)
 
-	log.Printf("[INFO] request: %s %s", verb, u.Path)
+	log.Printf("[INFO] request: %s %s %s", verb, u.Path, ro)
 
 	return c.rawRequest(verb, &u, ro)
 }
@@ -63,6 +63,7 @@ func (c *Client) rawRequest(verb string, u *url.URL, ro *RequestOptions) (*http.
 
 	// Create the request object
 	request, err := http.NewRequest(verb, u.String(), ro.Body)
+	log.Printf("URL: %s", u.String())
 	if err != nil {
 		return nil, err
 	}

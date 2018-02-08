@@ -62,29 +62,34 @@ type Client struct {
 }
 
 type ClientOptions struct {
-	BaseUrl       string
+	BaseURL       string
 	DefaultHeader http.Header
 	NoVerifyTLS   bool
 	CAPath        string
 	CAFile        string
 }
 
+func (c *ClientOptions) SetToken(token string) {
+	c.DefaultHeader.Set(authorizationHeader, fmt.Sprintf("Bearer %s", token))
+}
+
 func DefaultClientOptions() *ClientOptions {
 	header := make(http.Header)
-	header.Set(contentTypeHeader, defaultContentType)
-	header.Set(authorizationHeader, fmt.Sprintf("Bearer %s", os.Getenv(atlasTokenEnvVar)))
+	header.Set(contentTypeHeader, defaultContentType)	
 	header.Set(userAgentHeader, defaultUserAgent)
-	return &ClientOptions{
-		BaseUrl:       defaultBaseURL,
+	opts := &ClientOptions{
+		BaseURL:       defaultBaseURL,
 		DefaultHeader: header,
 		NoVerifyTLS:   os.Getenv(atlasTLSNoVerifyEnvVar) != "",
 		CAPath:        os.Getenv(atlasCAPathEnvVar),
 		CAFile:        os.Getenv(atlasCAFileEnvVar),
 	}
+	opts.SetToken(os.Getenv(atlasTokenEnvVar))
+	return opts
 }
 
 func NewClient(opts *ClientOptions) (*Client, error) {
-	u, err := url.Parse(opts.BaseUrl)
+	u, err := url.Parse(opts.BaseURL)
 	if err != nil {
 		return nil, err
 	}

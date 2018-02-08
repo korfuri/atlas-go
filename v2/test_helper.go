@@ -14,7 +14,7 @@ func testingClientServer(t *testing.T) (*Client, *testutils.Server) {
 	header.Set(authorizationHeader, "Bearer abcd1234")
 	header.Set(contentTypeHeader, defaultContentType)
 	opts := &ClientOptions{
-		BaseUrl:       server.BaseURL.String(),
+		BaseURL:       server.BaseURL.String(),
 		DefaultHeader: header,
 		NoVerifyTLS:   true,
 		CAPath:        "",
