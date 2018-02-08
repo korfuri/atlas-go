@@ -8,16 +8,21 @@ import (
 	"github.com/google/jsonapi"
 )
 
-func filterString(organization, workspace string) string {
-	return "filter%5Bworkspace%5D%5Bname%5D=test-uriel-destroy-me&filter%5Borganization%5D%5Busername%5D=Grab-TestAPI"
+func filterParams(organization, workspace string) map[string]string {
+	return map[string]string{
+		"filter[workspace][name]": workspace,
+		"filter[organization][username]": organization,
+	}
 }
 
 func (c *Client) ListVariables(organization string, workspace string) ([]*Variable, error) {
-	request, err := c.NewRequest("GET", "/vars", nil)
+	ro := &RequestOptions{
+		Params: filterParams(organization, workspace),
+	}
+	request, err := c.NewRequest("GET", "/vars", ro)
 	if err != nil {
 		return nil, err
 	}
-	request.URL.RawQuery = filterString(organization, workspace)
 	response, err := CheckResp(c.HTTPClient.Do(request))
 	if err != nil {
 		return nil, err
@@ -48,8 +53,21 @@ func (c *Client) GetVariableByKey(organization string, workspace string, key str
 			return v, nil
 		}
 	}
+	return nil, ErrNotFound
+}
+
+func (c *Client) GetVariableByID(organization string, workspace string, id string) (*Variable, error) {
+	vars, err := c.ListVariables(organization, workspace)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range vars {
+		if v.ID == id {
+			return v, nil
+		}
+	}
 	// TODO: return nil, Not Found
-	return nil, nil
+	return nil, ErrNotFound
 }
 
 func (c *Client) CreateVariable(organization string, workspace string, variable *Variable) (*Variable, error) {
@@ -59,12 +77,12 @@ func (c *Client) CreateVariable(organization string, workspace string, variable 
 	}
 	ro := &RequestOptions{
 		Body: buf,
+		Params: filterParams(organization, workspace),
 	}
 	request, err := c.NewRequest("POST", "/vars", ro)
 	if err != nil {
 		return nil, err
 	}
-	request.URL.RawQuery = filterString(organization, workspace)
 	response, err := CheckResp(c.HTTPClient.Do(request))
 	if err != nil {
 		return nil, err
@@ -101,4 +119,16 @@ func (c *Client) UpdateVariable(variable *Variable) (*Variable, error) {
 	}
 
 	return out_var, nil
+}
+
+func (c *Client) DeleteVariable(id string) error {
+	request, err := c.NewRequest("DELETE", fmt.Sprintf("/vars/%s", id), nil)
+	if err != nil {
+		return err
+	}
+	_, err = CheckResp(c.HTTPClient.Do(request))
+	if err != nil {
+		return err
+	}
+	return nil
 }
