@@ -105,7 +105,7 @@ func (c *Client) CreateCompoundWorkspace(organization string, workspace *Compoun
 	if err := jsonapi.UnmarshalPayload(buf2, out_workspace); err != nil {
 		return nil, err
 	}
-	
+
 	return out_workspace, nil
 }
 

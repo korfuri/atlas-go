@@ -75,7 +75,7 @@ func (c *ClientOptions) SetToken(token string) {
 
 func DefaultClientOptions() *ClientOptions {
 	header := make(http.Header)
-	header.Set(contentTypeHeader, defaultContentType)	
+	header.Set(contentTypeHeader, defaultContentType)
 	header.Set(userAgentHeader, defaultUserAgent)
 	opts := &ClientOptions{
 		BaseURL:       defaultBaseURL,

@@ -10,7 +10,7 @@ import (
 
 func filterParams(organization, workspace string) map[string]string {
 	return map[string]string{
-		"filter[workspace][name]": workspace,
+		"filter[workspace][name]":        workspace,
 		"filter[organization][username]": organization,
 	}
 }
@@ -76,7 +76,7 @@ func (c *Client) CreateVariable(organization string, workspace string, variable 
 		return nil, err
 	}
 	ro := &RequestOptions{
-		Body: buf,
+		Body:   buf,
 		Params: filterParams(organization, workspace),
 	}
 	request, err := c.NewRequest("POST", "/vars", ro)

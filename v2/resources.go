@@ -68,7 +68,7 @@ type CompoundWorkspace struct {
 	// workspace belongs to. It's only necessary to pass this
 	// during PATCH operations.
 	Organization string `jsonapi:"attr,organization,omitempty"`
-	
+
 	// LinkableRepiID is the name of the repository this workspace
 	// is linked to. If you're using Github or Bitbucket this is
 	// in the format "$user/$repo".
