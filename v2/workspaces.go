@@ -3,6 +3,7 @@ package tfe
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"reflect"
 
 	"github.com/google/jsonapi"
@@ -53,12 +54,13 @@ func (c *Client) GetWorkspaceByID(organization string, workspaceId string) (*Wor
 // VCS-integrated workspaces, see CreateCompoundWorkspace.
 func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Workspace, error) {
 	buf := new(bytes.Buffer)
-	if err := jsonapi.MarshalPayload(buf, workspace); err != nil {
+	if err := jsonapi.MarshalOnePayloadEmbedded(buf, workspace); err != nil {
 		return nil, err
 	}
 	ro := &RequestOptions{
 		Body: buf,
 	}
+	log.Printf("[DEBUG] Request body: %s", buf.String())
 	request, err := c.NewRequest("POST", fmt.Sprintf("/organizations/%s/workspaces", organization), ro)
 	if err != nil {
 		return nil, err
@@ -86,7 +88,49 @@ func (c *Client) CreateCompoundWorkspace(organization string, workspace *Compoun
 	ro := &RequestOptions{
 		Body: buf,
 	}
+	log.Printf("[DEBUG] Request body: %s", buf.String())
 	request, err := c.NewRequest("POST", "/compound-workspaces", ro)
+	if err != nil {
+		return nil, err
+	}
+	response, err := CheckResp(c.HTTPClient.Do(request))
+	if err != nil {
+		return nil, err
+	}
+
+	out_workspace := new(Workspace)
+	buf2 := new(bytes.Buffer)
+	buf2.ReadFrom(response.Body)
+	log.Printf("[DEBUG] Response body: `%s`", buf2.String())
+	if err := jsonapi.UnmarshalPayload(buf2, out_workspace); err != nil {
+		return nil, err
+	}
+	
+	return out_workspace, nil
+}
+
+func (c *Client) DeleteWorkspace(organization string, workspaceName string) error {
+	request, err := c.NewRequest("DELETE", fmt.Sprintf("/organizations/%s/workspaces/%s", organization, workspaceName), nil)
+	if err != nil {
+		return err
+	}
+	_, err = CheckResp(c.HTTPClient.Do(request))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) UpdateCompoundWorkspace(organization string, w *CompoundWorkspace) (*Workspace, error) {
+	buf := new(bytes.Buffer)
+	if err := jsonapi.MarshalPayload(buf, w); err != nil {
+		return nil, err
+	}
+	ro := &RequestOptions{
+		Body: buf,
+	}
+	log.Printf("[DEBUG] Request body: %s", buf.String())
+	request, err := c.NewRequest("PATCH", fmt.Sprintf("/compound-workspaces/%s", w.ID), ro)
 	if err != nil {
 		return nil, err
 	}
@@ -103,14 +147,29 @@ func (c *Client) CreateCompoundWorkspace(organization string, workspace *Compoun
 	return out_workspace, nil
 }
 
-func (c *Client) DeleteWorkspace(organization string, workspaceName string) error {
-	request, err := c.NewRequest("DELETE", fmt.Sprintf("/organizations/%s/workspaces/%s", organization, workspaceName), nil)
-	if err != nil {
-		return err
+func (c *Client) UpdateWorkspace(organization string, w *Workspace) (*Workspace, error) {
+	buf := new(bytes.Buffer)
+	if err := jsonapi.MarshalOnePayloadEmbedded(buf, w); err != nil {
+		return nil, err
 	}
-	_, err = CheckResp(c.HTTPClient.Do(request))
-	if err != nil {
-		return err
+	ro := &RequestOptions{
+		Body: buf,
 	}
-	return nil
+	log.Printf("[DEBUG] Request body: %s", buf.String())
+	name := w.Name
+	request, err := c.NewRequest("PATCH", fmt.Sprintf("/organizations/%s/workspaces/%s", organization, name), ro)
+	if err != nil {
+		return nil, err
+	}
+	response, err := CheckResp(c.HTTPClient.Do(request))
+	if err != nil {
+		return nil, err
+	}
+
+	out_workspace := new(Workspace)
+	if err := jsonapi.UnmarshalPayload(response.Body, out_workspace); err != nil {
+		return nil, err
+	}
+
+	return out_workspace, nil
 }
