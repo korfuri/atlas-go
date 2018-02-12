@@ -110,3 +110,12 @@ type Variable struct {
 	HCL       bool       `jsonapi:"attr,hcl"`
 	Workspace *Workspace `jsonapi:"relation,configurable"`
 }
+
+// LinkableRepo represents a linkable repository, i.e. a repository
+// hosted on a VCS hosting system like GitHub, Bitbucket, Gitlab, etc.
+type LinkableRepo struct {
+	// ID is a string identifying the repo. It appears to be the
+	// name of the repo according to the repo hosting provider,
+	// i.e. Grab/SecretProject for github.com/Grab/SecretProject.
+	ID string `jsonapi:"primary,linkable-repos"`
+}
