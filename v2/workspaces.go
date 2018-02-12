@@ -84,7 +84,6 @@ func (c *Client) CreateCompoundWorkspace(organization string, workspace *Compoun
 	if err := jsonapi.MarshalPayload(buf, workspace); err != nil {
 		return nil, err
 	}
-	fmt.Println(buf)
 	ro := &RequestOptions{
 		Body: buf,
 	}
