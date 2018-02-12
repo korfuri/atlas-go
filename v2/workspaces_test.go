@@ -54,7 +54,7 @@ func makeWorkspaceHandler(t *testing.T, srv *testutils.Server) func(rw http.Resp
 }
 
 func TestLifecycle(t *testing.T) {
-	client, server := testingClientServer(t)
+	client, server := TestingClientServer(t)
 	defer server.Stop()
 
 	handler := makeWorkspaceHandler(t, server)

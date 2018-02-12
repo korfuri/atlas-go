@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testingClientServer(t *testing.T) (*Client, *testutils.Server) {
+func TestingClientServer(t *testing.T) (*Client, *testutils.Server) {
 	server := testutils.NewTestServer(t)
 	header := make(http.Header)
 	header.Set(authorizationHeader, "Bearer abcd1234")

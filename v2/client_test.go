@@ -8,7 +8,7 @@ import (
 )
 
 func TestRequest(t *testing.T) {
-	client, server := testingClientServer(t)
+	client, server := TestingClientServer(t)
 	defer server.Stop()
 
 	server.Mux.HandleFunc("/somepath", func(rw http.ResponseWriter, r *http.Request) {})
