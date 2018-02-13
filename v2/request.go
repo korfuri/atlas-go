@@ -63,7 +63,6 @@ func (c *Client) rawRequest(verb string, u *url.URL, ro *RequestOptions) (*http.
 
 	// Create the request object
 	request, err := http.NewRequest(verb, u.String(), ro.Body)
-	log.Printf("URL: %s", u.String())
 	if err != nil {
 		return nil, err
 	}

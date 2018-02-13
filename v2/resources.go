@@ -33,7 +33,8 @@ type Workspace struct {
 	// approval
 	AutoApply bool `jsonapi:"attr,auto-apply,omitempty"`
 
-	// TODO
+	// Locked is a read-only attribute that indicates whether the
+	// workspace is locked.
 	Locked bool `jsonapi:"attr,locked,omitempty"`
 
 	// CreatedAt is the timestamp of this workspace's creation
@@ -47,7 +48,8 @@ type Workspace struct {
 	// workspace.
 	TerraformVersion string `jsonapi:"attr,terraform-version,omitempty"`
 
-	// TODO what's that
+	// CanQueueDestroyPlan indicates whether the workspace allows
+	// creating a destroy plan.
 	CanQueueDestroyPlan bool `jsonapi:"attr,can-queue-destroy-plan,omitempty"`
 
 	// IngressTriggerAttributes is the settings struct for VCS

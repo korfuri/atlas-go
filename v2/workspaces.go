@@ -46,8 +46,7 @@ func (c *Client) GetWorkspaceByID(organization string, workspaceId string) (*Wor
 		}
 	}
 
-	// TODO: return a proper error type that can be tested for the NotFound case
-	return nil, nil
+	return nil, ErrNotFound
 }
 
 // CreateWorkspace creates a workspace without VCS integration. For

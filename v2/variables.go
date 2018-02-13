@@ -66,7 +66,6 @@ func (c *Client) GetVariableByID(organization string, workspace string, id strin
 			return v, nil
 		}
 	}
-	// TODO: return nil, Not Found
 	return nil, ErrNotFound
 }
 
