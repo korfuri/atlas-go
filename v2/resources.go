@@ -59,6 +59,7 @@ type Workspace struct {
 
 // CompoundWorkspace is a special type of Workspace resource used only
 // when creating a VCS-integrated workspace.
+// https://www.terraform.io/docs/enterprise/api/workspaces.html#create-a-workspace-with-a-vcs-repository
 type CompoundWorkspace struct {
 	// ID is the ID of the workspace during an update.
 	ID string `jsonapi:"primary,compound-workspaces,omitempty"`
@@ -91,10 +92,14 @@ type CompoundWorkspace struct {
 	IngressTriggerAttributes *IngressTriggerAttributesT `jsonapi:"attr,ingress-trigger-attributes"`
 }
 
+// OauthClientT represents an OAuth Client. This is not directly
+// manipulatable in the API, but it is used as part of the OAuthToken
+// type.
 type OAuthClientT struct {
 	ID string `jsonapi:"primary,oauth-clients"`
 }
 
+// OAuthToken represents the OAuth Token associated with an OAuth Client.
 type OAuthToken struct {
 	ID                  string       `jsonapi:"primary,oauth-tokens"`
 	CreatedAt           time.Time    `jsonapi:"attr,created-at,iso8601"`
@@ -103,6 +108,8 @@ type OAuthToken struct {
 	OAuthClient         OAuthClientT `jsonapi:"relation,oauth-client`
 }
 
+// Variable represents a workspace variable.
+// https://www.terraform.io/docs/enterprise/api/variables.html
 type Variable struct {
 	ID        string     `jsonapi:"primary,vars"`
 	Key       string     `jsonapi:"attr,key"`
@@ -120,4 +127,12 @@ type LinkableRepo struct {
 	// name of the repo according to the repo hosting provider,
 	// i.e. Grab/SecretProject for github.com/Grab/SecretProject.
 	ID string `jsonapi:"primary,linkable-repos"`
+}
+
+// Team is a collection of users that may be granted permissions.
+// https://www.terraform.io/docs/enterprise/api/teams.html
+type Team struct {
+	ID string `jsonapi:"primary,teams"`
+	Name string `jsonapi:"attr,name"`
+	UsersCount int `jsonapi:"attr,users-count"`
 }
