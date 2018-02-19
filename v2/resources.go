@@ -132,7 +132,20 @@ type LinkableRepo struct {
 // Team is a collection of users that may be granted permissions.
 // https://www.terraform.io/docs/enterprise/api/teams.html
 type Team struct {
-	ID string `jsonapi:"primary,teams"`
-	Name string `jsonapi:"attr,name"`
-	UsersCount int `jsonapi:"attr,users-count"`
+	ID         string `jsonapi:"primary,teams"`
+	Name       string `jsonapi:"attr,name"`
+	UsersCount int    `jsonapi:"attr,users-count"`
+}
+
+// TeamAccess represents a permission for a given Team to access a
+// given Workspace.
+// https://www.terraform.io/docs/enterprise/api/team-access.html
+type TeamAccess struct {
+	ID string `jsonapi:"primary,team-workspaces"`
+
+	// Access should be "read", "write" or "admin"
+	Access string `jsonapi:"attr,access"`
+
+	Team      *Team      `jsonapi:"relation,team"`
+	Workspace *Workspace `jsonapi:"relation,workspace"`
 }
