@@ -4,8 +4,13 @@ import (
 	"time"
 )
 
+// Organization represents an organization in Terraform Enterprise.
+// The API to manipulate organizations is undocumented.
 type Organization struct {
-	ID string `jsonapi:"primary,organizations"`
+	ID             string `jsonapi:"primary,organizations"`
+	Name           string `jsonapi:"attr,username"`
+	Email          string `jsonapi:"attr,email"`
+	EnterprisePlan string `jsonapi:"attr,enterprise-plan"`
 }
 
 type IngressTriggerAttributesT struct {
