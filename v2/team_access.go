@@ -53,7 +53,7 @@ func (c *Client) GetTeamAccessByID(id string) (*TeamAccess, error) {
 		return nil, err
 	}
 
-	return out_ta, nil	
+	return out_ta, nil
 }
 
 func (c *Client) DeleteTeamAccess(id string) error {
