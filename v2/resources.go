@@ -134,7 +134,7 @@ type LinkableRepo struct {
 type Team struct {
 	ID         string `jsonapi:"primary,teams"`
 	Name       string `jsonapi:"attr,name"`
-	UsersCount int    `jsonapi:"attr,users-count"`
+	UsersCount int    `jsonapi:"attr,users-count,omitempty"`
 }
 
 // TeamAccess represents a permission for a given Team to access a
