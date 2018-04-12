@@ -8,15 +8,24 @@ import (
 // The API to manipulate organizations is undocumented.
 type Organization struct {
 	ID             string `jsonapi:"primary,organizations"`
-	Name           string `jsonapi:"attr,username"`
+	Name           string `jsonapi:"attr,name"`
 	Email          string `jsonapi:"attr,email"`
 	EnterprisePlan string `jsonapi:"attr,enterprise-plan"`
 }
 
-type IngressTriggerAttributesT struct {
+type VCSRepoT struct {
+	// LinkableRepiID is the name of the repository this workspace
+	// is linked to. If you're using Github or Bitbucket this is
+	// in the format "$user/$repo".
+	LinkableRepoID string `json:"identifier"`
+
+	// OAuthTokenID is the ID of a previously registered OAuth
+	// token for Terraform to connect to your VCS system (Github,
+	// Bitbucket, Gitlab...).
+	OAuthTokenID string `json:"oauth-token-id"`
+
 	Branch            string `json:"branch"`
 	DefaultBranch     bool   `json:"default-branch"`
-	VCSRootPath       string `json:"vcs-root-path"`
 	IngressSubmodules bool   `json:"ingress-submodules"`
 }
 
@@ -47,7 +56,7 @@ type Workspace struct {
 
 	// WorkingDirectory is the working directory within the VCS
 	// repository used to run Terraform for this workspace.
-	WorkingDirectory string `jsonapi:"attr,working-directory,omitempty"`
+	WorkingDirectory string `jsonapi:"attr,working-directory"`
 
 	// TerraformVersion is the version of Terraform in use in this
 	// workspace.
@@ -59,42 +68,7 @@ type Workspace struct {
 
 	// IngressTriggerAttributes is the settings struct for VCS
 	// integration
-	// IngressTriggerAttributes *IngressTriggerAttributesT `jsonapi:"relation,ingress-trigger-attributes"`
-}
-
-// CompoundWorkspace is a special type of Workspace resource used only
-// when creating a VCS-integrated workspace.
-// https://www.terraform.io/docs/enterprise/api/workspaces.html#create-a-workspace-with-a-vcs-repository
-type CompoundWorkspace struct {
-	// ID is the ID of the workspace during an update.
-	ID string `jsonapi:"primary,compound-workspaces,omitempty"`
-
-	// Name is the name of the new workspace.
-	Name string `jsonapi:"attr,name,omitempty"`
-
-	// Organization is the name of organization that this
-	// workspace belongs to. It's only necessary to pass this
-	// during PATCH operations.
-	Organization string `jsonapi:"attr,organization,omitempty"`
-
-	// LinkableRepiID is the name of the repository this workspace
-	// is linked to. If you're using Github or Bitbucket this is
-	// in the format "$user/$repo".
-	LinkableRepoID string `jsonapi:"attr,linkable-repo-id,omitempty"`
-
-	// OAuthTokenID is the ID of a previously registered OAuth
-	// token for Terraform to connect to your VCS system (Github,
-	// Bitbucket, Gitlab...).
-	OAuthTokenID string `jsonapi:"attr,oauth-token-id,omitempty"`
-
-	// WorkingDirectory is the path under the repo to which
-	// Terraform enterprise cd's before running
-	// Terraform. Optional.
-	WorkingDirectory string `jsonapi:"attr,working-directory,omitempty"`
-
-	// IngressTriggerAttributes is the settings struct for VCS
-	// integration
-	IngressTriggerAttributes *IngressTriggerAttributesT `jsonapi:"attr,ingress-trigger-attributes"`
+	VCSRepo VCSRepoT `jsonapi:"attr,vcs-repo,omitempty"`
 }
 
 // OauthClientT represents an OAuth Client. This is not directly
@@ -116,13 +90,15 @@ type OAuthToken struct {
 // Variable represents a workspace variable.
 // https://www.terraform.io/docs/enterprise/api/variables.html
 type Variable struct {
-	ID        string     `jsonapi:"primary,vars"`
-	Key       string     `jsonapi:"attr,key"`
-	Value     string     `jsonapi:"attr,value"`
-	Sensitive bool       `jsonapi:"attr,sensitive"`
-	Category  string     `jsonapi:"attr,category"`
-	HCL       bool       `jsonapi:"attr,hcl"`
-	Workspace *Workspace `jsonapi:"relation,configurable"`
+	ID                   string     `jsonapi:"primary,vars"`
+	Key                  string     `jsonapi:"attr,key"`
+	Value                string     `jsonapi:"attr,value"`
+	Sensitive            bool       `jsonapi:"attr,sensitive"`
+	Category             string     `jsonapi:"attr,category"`
+	HCL                  bool       `jsonapi:"attr,hcl"`
+	Workspace            *Workspace `jsonapi:"relation,configurable"`
+	workspaceForCreation string
+	orgForCreation       string
 }
 
 // LinkableRepo represents a linkable repository, i.e. a repository

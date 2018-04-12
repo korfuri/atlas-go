@@ -49,8 +49,7 @@ func (c *Client) GetWorkspaceByID(organization string, workspaceId string) (*Wor
 	return nil, ErrNotFound
 }
 
-// CreateWorkspace creates a workspace without VCS integration. For
-// VCS-integrated workspaces, see CreateCompoundWorkspace.
+// CreateWorkspace creates a workspace.
 func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Workspace, error) {
 	buf := new(bytes.Buffer)
 	if err := jsonapi.MarshalOnePayloadEmbedded(buf, workspace); err != nil {
@@ -77,36 +76,6 @@ func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Wo
 	return out_workspace, nil
 }
 
-// CreateCompoundWorkspace creates a workspace with VCS integration.
-func (c *Client) CreateCompoundWorkspace(organization string, workspace *CompoundWorkspace) (*Workspace, error) {
-	buf := new(bytes.Buffer)
-	if err := jsonapi.MarshalPayload(buf, workspace); err != nil {
-		return nil, err
-	}
-	ro := &RequestOptions{
-		Body: buf,
-	}
-	log.Printf("[DEBUG] Request body: %s", buf.String())
-	request, err := c.NewRequest("POST", "/compound-workspaces", ro)
-	if err != nil {
-		return nil, err
-	}
-	response, err := CheckResp(c.HTTPClient.Do(request))
-	if err != nil {
-		return nil, err
-	}
-
-	out_workspace := new(Workspace)
-	buf2 := new(bytes.Buffer)
-	buf2.ReadFrom(response.Body)
-	log.Printf("[DEBUG] Response body: `%s`", buf2.String())
-	if err := jsonapi.UnmarshalPayload(buf2, out_workspace); err != nil {
-		return nil, err
-	}
-
-	return out_workspace, nil
-}
-
 func (c *Client) DeleteWorkspace(organization string, workspaceName string) error {
 	request, err := c.NewRequest("DELETE", fmt.Sprintf("/organizations/%s/workspaces/%s", organization, workspaceName), nil)
 	if err != nil {
@@ -117,32 +86,6 @@ func (c *Client) DeleteWorkspace(organization string, workspaceName string) erro
 		return err
 	}
 	return nil
-}
-
-func (c *Client) UpdateCompoundWorkspace(organization string, w *CompoundWorkspace) (*Workspace, error) {
-	buf := new(bytes.Buffer)
-	if err := jsonapi.MarshalPayload(buf, w); err != nil {
-		return nil, err
-	}
-	ro := &RequestOptions{
-		Body: buf,
-	}
-	log.Printf("[DEBUG] Request body: %s", buf.String())
-	request, err := c.NewRequest("PATCH", fmt.Sprintf("/compound-workspaces/%s", w.ID), ro)
-	if err != nil {
-		return nil, err
-	}
-	response, err := CheckResp(c.HTTPClient.Do(request))
-	if err != nil {
-		return nil, err
-	}
-
-	out_workspace := new(Workspace)
-	if err := jsonapi.UnmarshalPayload(response.Body, out_workspace); err != nil {
-		return nil, err
-	}
-
-	return out_workspace, nil
 }
 
 func (c *Client) UpdateWorkspace(organization string, w *Workspace) (*Workspace, error) {

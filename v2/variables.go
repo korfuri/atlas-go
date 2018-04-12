@@ -8,16 +8,16 @@ import (
 	"github.com/google/jsonapi"
 )
 
-func filterParams(organization, workspace string) map[string]string {
+func filterGetParams(organization, workspace string) map[string]string {
 	return map[string]string{
-		"filter[workspace][name]":        workspace,
-		"filter[organization][username]": organization,
+		"filter[workspace][name]":    workspace,
+		"filter[organization][name]": organization,
 	}
 }
 
 func (c *Client) ListVariables(organization string, workspace string) ([]*Variable, error) {
 	ro := &RequestOptions{
-		Params: filterParams(organization, workspace),
+		Params: filterGetParams(organization, workspace),
 	}
 	request, err := c.NewRequest("GET", "/vars", ro)
 	if err != nil {
@@ -69,14 +69,38 @@ func (c *Client) GetVariableByID(organization string, workspace string, id strin
 	return nil, ErrNotFound
 }
 
+// This is a mild hack: because TFE's API expects the workspace and
+// organization to be passed as a "filter" object (similar to a "meta"
+// or "links", except it's not standard JSONAPI behavior), we use a
+// forked version of google/jsonapi that supports these objects. To
+// add this object, we implement the method below.
+func (v *Variable) JSONAPIFilter() *jsonapi.Filter {
+	type namedObject struct {
+		Name string `json:"name"`
+	}
+
+	// if we don't know the workspace nor the org, we're probably
+	// not creating a variable, most likely we're updating it. No
+	// need to specify filters here.
+	if v.workspaceForCreation == "" && v.orgForCreation == "" {
+		return &jsonapi.Filter{}
+	}
+
+	return &jsonapi.Filter{
+		"workspace":    namedObject{v.workspaceForCreation},
+		"organization": namedObject{v.orgForCreation},
+	}
+}
+
 func (c *Client) CreateVariable(organization string, workspace string, variable *Variable) (*Variable, error) {
 	buf := new(bytes.Buffer)
+	variable.workspaceForCreation = workspace
+	variable.orgForCreation = organization
 	if err := jsonapi.MarshalPayload(buf, variable); err != nil {
 		return nil, err
 	}
 	ro := &RequestOptions{
-		Body:   buf,
-		Params: filterParams(organization, workspace),
+		Body: buf,
 	}
 	request, err := c.NewRequest("POST", "/vars", ro)
 	if err != nil {
