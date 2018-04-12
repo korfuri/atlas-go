@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/google/jsonapi"
+	"github.com/korfuri/jsonapi"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/google/jsonapi"
+	"github.com/korfuri/jsonapi"
 )
 
 func (c *Client) ListWorkspaces(organization string) ([]*Workspace, error) {

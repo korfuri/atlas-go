@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/google/jsonapi"
+	"github.com/korfuri/jsonapi"
 )
 
 func (c *Client) ListTeams(organization string) ([]*Team, error) {

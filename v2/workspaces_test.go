@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/jsonapi"
 	"github.com/hashicorp/atlas-go/v2/testutils"
+	"github.com/korfuri/jsonapi"
 	"github.com/stretchr/testify/assert"
 )
 
