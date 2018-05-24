@@ -107,7 +107,7 @@ type LinkableRepo struct {
 	// ID is a string identifying the repo. It appears to be the
 	// name of the repo according to the repo hosting provider,
 	// i.e. Grab/SecretProject for github.com/Grab/SecretProject.
-	ID string `jsonapi:"primary,linkable-repos"`
+	ID string `jsonapi:"primary,authorized-repos"`
 }
 
 // Team is a collection of users that may be granted permissions.

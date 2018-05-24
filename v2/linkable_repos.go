@@ -8,7 +8,7 @@ import (
 )
 
 func (c *Client) ListLinkableRepos(oauthTokenID string) ([]*LinkableRepo, error) {
-	request, err := c.NewRequest("GET", fmt.Sprintf("/oauth-tokens/%s/linkable-repos", oauthTokenID), nil)
+	request, err := c.NewRequest("GET", fmt.Sprintf("/oauth-tokens/%s/authorized-repos", oauthTokenID), nil)
 	if err != nil {
 		return nil, err
 	}
