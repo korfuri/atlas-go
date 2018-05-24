@@ -9,41 +9,54 @@ import (
 	"github.com/korfuri/jsonapi"
 )
 
-func (c *Client) ListWorkspaces(organization string) ([]*Workspace, error) {
-	request, err := c.NewRequest("GET", fmt.Sprintf("/organizations/%s/workspaces", organization), nil)
+func (c *Client) listWorkspaces(organization string, page int) ([]*Workspace, bool, error) {
+	ro := &RequestOptions{
+		Params: map[string]string{
+			"sort":         "name",
+			"page[size]":   "20",
+			"page[number]": fmt.Sprintf("%d", page),
+		},
+	}
+	request, err := c.NewRequest("GET", fmt.Sprintf("/organizations/%s/workspaces", organization), ro)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	response, err := CheckResp(c.HTTPClient.Do(request))
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	objs, err := jsonapi.UnmarshalManyPayload(response.Body, reflect.TypeOf(new(Workspace)))
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	workspaces := make([]*Workspace, len(objs))
 	for i, o := range objs {
 		w, ok := o.(*Workspace)
 		if !ok {
-			return nil, fmt.Errorf("Invalid type during unmarshaling, data was %v", o)
+			return nil, false, fmt.Errorf("Invalid type during unmarshaling, data was %v", o)
 		}
 		workspaces[i] = w
 	}
-	return workspaces, nil
+	more := len(workspaces) >= 20
+	return workspaces, more, nil
 }
 
 func (c *Client) GetWorkspaceByID(organization string, workspaceId string) (*Workspace, error) {
-	workspaces, err := c.ListWorkspaces(organization)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, w := range workspaces {
-		if w.ID == workspaceId {
-			return w, nil
+	page := 1
+	for more := true; more; {
+		workspaces, evenmore, err := c.listWorkspaces(organization, page)
+		if err != nil {
+			return nil, err
 		}
+
+		for _, w := range workspaces {
+			if w.ID == workspaceId {
+				return w, nil
+			}
+		}
+		more = evenmore
+		page = page + 1
 	}
 
 	return nil, ErrNotFound
