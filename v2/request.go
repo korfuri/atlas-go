@@ -1,12 +1,14 @@
 package tfe
 
 import (
+	"bytes"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"path"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 // RequestOptions is the list of options to pass to the request.
@@ -17,14 +19,16 @@ type RequestOptions struct {
 	// Headers is a map of key-value pairs that will be added to the Request.
 	Headers map[string]string
 
-	// Body is an io.Reader object that will be streamed or uploaded with the
+	// Body is a bytes.Buffer object that will be streamed or uploaded with the
 	// Request. BodyLength is the final size of the Body.
-	Body       io.Reader
+	Body       *bytes.Buffer
 	BodyLength int64
 }
 
+type Request = retryablehttp.Request
+
 // Request creates a new HTTP request using the given verb and sub path.
-func (c *Client) NewRequest(verb, spath string, ro *RequestOptions) (*http.Request, error) {
+func (c *Client) NewRequest(verb, spath string, ro *RequestOptions) (*Request, error) {
 	// Ensure we have a RequestOptions struct (passing nil is an acceptable)
 	if ro == nil {
 		ro = new(RequestOptions)
@@ -40,8 +44,8 @@ func (c *Client) NewRequest(verb, spath string, ro *RequestOptions) (*http.Reque
 }
 
 // rawRequest accepts a verb, URL, and RequestOptions struct and returns the
-// constructed http.Request and any errors that occurred
-func (c *Client) rawRequest(verb string, u *url.URL, ro *RequestOptions) (*http.Request, error) {
+// constructed Request and any errors that occurred
+func (c *Client) rawRequest(verb string, u *url.URL, ro *RequestOptions) (*Request, error) {
 	if verb == "" {
 		return nil, fmt.Errorf("client: missing verb")
 	}
@@ -61,8 +65,13 @@ func (c *Client) rawRequest(verb string, u *url.URL, ro *RequestOptions) (*http.
 	}
 	u.RawQuery = params.Encode()
 
+	var body *bytes.Reader = bytes.NewReader([]byte(""))
+	if ro.Body != nil {
+		body = bytes.NewReader(ro.Body.Bytes())
+	}
+	
 	// Create the request object
-	request, err := http.NewRequest(verb, u.String(), ro.Body)
+	request, err := retryablehttp.NewRequest(verb, u.String(), body)
 	if err != nil {
 		return nil, err
 	}

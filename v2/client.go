@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/go-cleanhttp"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/go-rootcerts"
 )
 
@@ -54,7 +55,7 @@ type Client struct {
 	URL *url.URL
 
 	// HTTPClient is the underlying http client with which to make requests.
-	HTTPClient *http.Client
+	HTTPClient *retryablehttp.Client
 
 	// DefaultHeaders is a set of headers that will be added to every request.
 	// This minimally includes the atlas user-agent string.
@@ -88,6 +89,19 @@ func DefaultClientOptions() *ClientOptions {
 	return opts
 }
 
+// retryPolicy implements retryablehttp.RetryPolicy. It copies the
+// default behavior (retry on internal server errors and client
+// network failures) and also retries on HTTP 429 too many requests.
+func retryPolicy(resp *http.Response, err error) (bool, error) {
+	if err != nil {
+		return true, err
+	}
+	if resp.StatusCode == 429 {
+		return true, nil
+	}
+	return retryablehttp.DefaultRetryPolicy(resp, err)
+}
+
 func NewClient(opts *ClientOptions) (*Client, error) {
 	u, err := url.Parse(opts.BaseURL)
 	if err != nil {
@@ -98,7 +112,8 @@ func NewClient(opts *ClientOptions) (*Client, error) {
 		DefaultHeader: opts.DefaultHeader,
 	}
 
-	client.HTTPClient = cleanhttp.DefaultClient()
+	client.HTTPClient = retryablehttp.NewClient()
+	client.HTTPClient.CheckRetry = retryPolicy
 	tlsConfig := &tls.Config{}
 	if opts.NoVerifyTLS {
 		tlsConfig.InsecureSkipVerify = true
@@ -112,6 +127,6 @@ func NewClient(opts *ClientOptions) (*Client, error) {
 	}
 	t := cleanhttp.DefaultTransport()
 	t.TLSClientConfig = tlsConfig
-	client.HTTPClient.Transport = t
+	client.HTTPClient.HTTPClient.Transport = t
 	return client, nil
 }
