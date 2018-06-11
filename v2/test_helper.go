@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/hashicorp/atlas-go/v2/testutils"
+	"github.com/korfuri/atlas-go/v2/testutils"
 	"github.com/stretchr/testify/assert"
 )
 

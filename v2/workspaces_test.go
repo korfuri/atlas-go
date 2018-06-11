@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/atlas-go/v2/testutils"
+	"github.com/korfuri/atlas-go/v2/testutils"
 	"github.com/korfuri/jsonapi"
 	"github.com/stretchr/testify/assert"
 )
@@ -61,23 +61,27 @@ func TestLifecycle(t *testing.T) {
 	server.Mux.HandleFunc("/organizations/TestOrg/workspaces", handler)
 	server.Mux.HandleFunc("/organizations/TestOrg/workspaces/", handler)
 
-	workspaces, err := client.ListWorkspaces("TestOrg")
+	workspaces, hasmore, err := client.listWorkspaces("TestOrg", 0)
 	assert.NoError(t, err)
 	assert.Len(t, workspaces, 0)
+	assert.False(t, hasmore)
 
 	newWorkspace, err := client.CreateWorkspace("TestOrg", &Workspace{Name: "my-workspace"})
 	assert.NoError(t, err)
 	assert.Equal(t, "my-workspace", newWorkspace.Name)
+	assert.False(t, hasmore)
 
-	workspaces, err = client.ListWorkspaces("TestOrg")
+	workspaces, hasmore, err = client.listWorkspaces("TestOrg", 0)
 	assert.NoError(t, err)
 	assert.Len(t, workspaces, 1)
 	assert.Equal(t, "my-workspace", workspaces[0].Name)
+	assert.False(t, hasmore)
 
 	err = client.DeleteWorkspace("TestOrg", "my-workspace")
 	assert.NoError(t, err)
 
-	workspaces, err = client.ListWorkspaces("TestOrg")
+	workspaces, hasmore, err = client.listWorkspaces("TestOrg", 0)
 	assert.NoError(t, err)
 	assert.Len(t, workspaces, 0)
+	assert.False(t, hasmore)
 }
