@@ -62,6 +62,24 @@ func (c *Client) GetWorkspaceByID(organization string, workspaceId string) (*Wor
 	return nil, ErrNotFound
 }
 
+func (c *Client) GetWorkspaceByName(organization string, workspaceName string) (*Workspace, error) {
+	request, err := c.NewRequest("GET", fmt.Sprintf("/organizations/%s/workspaces/%s", organization, workspaceName), nil)
+	if err != nil {
+		return nil, err
+	}
+	response, err := CheckResp(c.HTTPClient.Do(request))
+	if err != nil {
+		return nil, err
+	}
+
+	out_ws := new(Workspace)
+	if err := jsonapi.UnmarshalPayload(response.Body, out_ws); err != nil {
+		return nil, err
+	}
+
+	return out_ws, nil
+}
+
 // CreateWorkspace creates a workspace.
 func (c *Client) CreateWorkspace(organization string, workspace *Workspace) (*Workspace, error) {
 	buf := new(bytes.Buffer)
