@@ -1,6 +1,7 @@
 package tfe
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
@@ -92,14 +93,14 @@ func DefaultClientOptions() *ClientOptions {
 // retryPolicy implements retryablehttp.RetryPolicy. It copies the
 // default behavior (retry on internal server errors and client
 // network failures) and also retries on HTTP 429 too many requests.
-func retryPolicy(resp *http.Response, err error) (bool, error) {
+func retryPolicy(ctx context.Context, resp *http.Response, err error) (bool, error) {
 	if err != nil {
 		return true, err
 	}
 	if resp.StatusCode == 429 {
 		return true, nil
 	}
-	return retryablehttp.DefaultRetryPolicy(resp, err)
+	return retryablehttp.DefaultRetryPolicy(ctx, resp, err)
 }
 
 func NewClient(opts *ClientOptions) (*Client, error) {
